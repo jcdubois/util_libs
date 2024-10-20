@@ -21,7 +21,7 @@ static const int uart3_irqs[] = {UART3_IRQ, -1};
 static const int uart4_irqs[] = {UART4_IRQ, -1};
 
 #define UART_DEFN(devid) {          \
-    .id      = IMX_UART##devid,    \
+    .id      = LS_DUART_UART##devid,    \
     .paddr   = UART##devid##_PADDR, \
     .size    = BIT(12),             \
     .irqs    = uart##devid##_irqs,  \

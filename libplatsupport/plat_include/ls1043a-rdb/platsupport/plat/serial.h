@@ -20,7 +20,7 @@
 #define UART3_IRQ    87
 #define UART4_IRQ    87
 
-#define UART_REF_CLK 12096000
+#define UART_REF_CLK 100000000
 
 #if defined(CONFIG_PLAT_LS1043A_RDB)
 #define DEFAULT_SERIAL_PADDR        UART1_PADDR

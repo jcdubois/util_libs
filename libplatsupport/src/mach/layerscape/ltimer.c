@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-/* Implementation of a logical timer for imx platforms
+/* Implementation of a logical timer for layerscape platforms
  *
- * Currently all imx platforms use some combination of GPT and EPIT timers to provide ltimer functionality. See platform specific timer.h for details.
+ * Currently all layerscape platforms use some combination of GPT and EPIT timers to provide ltimer functionality. See platform specific timer.h for details.
  */
 #include <platsupport/timer.h>
 #include <platsupport/ltimer.h>
