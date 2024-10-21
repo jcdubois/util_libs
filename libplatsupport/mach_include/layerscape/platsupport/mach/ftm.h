@@ -10,7 +10,7 @@
 #include <platsupport/ltimer.h>
 #include <platsupport/fdt.h>
 #include <platsupport/timer.h>
-#include <platsupport/plat/gpt_constants.h>
+#include <platsupport/plat/ftm_constants.h>
 
 #include <stdint.h>
 
@@ -25,9 +25,9 @@ typedef struct {
     char *device_path;
     /* prescaler to scale time by. 0 = divide by 1. 1 = divide by 2. ...*/
     uint32_t prescaler;
-} gpt_config_t;
+} ftm_config_t;
 
-struct gpt_map;
+struct ftm_map;
 
 typedef struct gpt {
     ps_io_ops_t io_ops;
@@ -35,16 +35,16 @@ typedef struct gpt {
     ltimer_callback_fn_t user_callback;
     void *user_callback_token;
     pmem_region_t timer_pmem;
-    volatile struct gpt_map *gpt_map;
+    volatile struct ftm_map *ftm_map;
     uint32_t prescaler;
     uint32_t high_bits;
-} gpt_t;
+} ftm_t;
 
 /* More can be done with this timer
  * but this driver can only count up
  * currently.
  */
-static inline timer_properties_t gpt_get_properies(void)
+static inline timer_properties_t ftm_get_properies(void)
 {
     return (timer_properties_t) {
         .upcounter = true,
@@ -60,21 +60,16 @@ static inline timer_properties_t gpt_get_properies(void)
 /*
  * Initialise a passed in gpt struct with the provided config
  */
-int gpt_init(gpt_t *gpt, gpt_config_t config);
+int ftm_init(ftm_t *ftm, ftm_config_t config);
 
 /* start the gpt */
-int gpt_start(gpt_t *gpt);
+int ftm_start(ftm_t *ftm);
 /* stop the gpt */
-int gpt_stop(gpt_t  *gpt);
+int ftm_stop(ftm_t  *ftm);
 /* destroy the gpt */
-int gpt_destroy(gpt_t *gpt);
+int ftm_destroy(ftm_t *ftm);
 /* read the value of the current time in ns */
-uint64_t gpt_get_time(gpt_t *gpt);
+uint64_t ftm_get_time(ftm_t *ftm);
 /* set a relative timeout */
-/* WARNING: Please note that once a GPT is set to trigger timeout interrupt(s),
- * it can not be used for the timekeeping purpose (i.e. the gpt_get_time
- * will not work on the GPT). The GPT has to be reinitialised by calling
- * gpt_init again in order to be used a timekeeping clock.
- */
-int gpt_set_timeout(gpt_t *gpt, uint64_t ns, bool periodic);
+int ftm_set_timeout(ftm_t *ftm, uint64_t ns, bool periodic);
 
