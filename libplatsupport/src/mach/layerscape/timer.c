@@ -16,7 +16,7 @@
 
 #include <byteswap.h>
 
-#include <platsupport/mach/timer.h>
+#include <platsupport/plat/timer.h>
 #include <platsupport/timer.h>
 
 #define CLEANUP_FAIL_TEXT                                                      \

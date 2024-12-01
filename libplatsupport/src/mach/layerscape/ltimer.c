@@ -10,7 +10,7 @@
  * Does not implement some functions yet.
  */
 #include <platsupport/ltimer.h>
-#include <platsupport/mach/timer.h>
+#include <platsupport/plat/timer.h>
 #include <platsupport/timer.h>
 
 #include <utils/util.h>
