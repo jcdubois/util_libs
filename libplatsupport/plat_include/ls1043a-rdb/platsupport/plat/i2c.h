@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Data61, CSIRO (ABN 41 687 119 230)
+ * Copyright 2024, Jean-Christophe Dubois
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -9,10 +9,6 @@
 #include <platsupport/io.h>
 
 enum i2c_id {
-    I2C1,
-    I2C2,
-    I2C3,
-    I2C4,
     NI2C
 };
 
