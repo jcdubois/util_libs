@@ -12,6 +12,10 @@
 #define CLEANUP_FAIL_TEXT                                                      \
   "Failed to cleanup the FTM after failing to initialise it"
 
+#define FTM_SC_CLK_SRC_NONE 0b00 
+#define FTM_SC_CLK_SRC_SYST 0b01
+#define FTM_SC_CLK_SRC_FIXE 0b10
+#define FTM_SC_CLK_SRC_EXTE 0b11
 #define FTM_SC_CLK_MASK_SHIFT 3
 #define FTM_SC_CLK_MASK (3 << FTM_SC_CLK_MASK_SHIFT)
 #define FTM_SC_TOF 0x80
@@ -28,17 +32,20 @@
 #define FTM_SC_PS_128 0x7
 #define FTM_SC_PS_MASK 0x7
 
+#define FTM_SC_CLK_SRC FTM_SC_CLK_SRC_FIXE
+#define FTM_SC_PS_DIVISOR FTM_SC_PS_128
+
+
 #define FTM_SC_CLK(c) ((c) << FTM_SC_CLK_MASK_SHIFT)
 
 /*
  * Select Fixed frequency clock (32KHz) as clock source
  * of FlexTimer Module
  */
-#define FTM_SC_CLKS_FIXED_FREQ 0x02
 #define FIXED_FREQ_CLK 32000
 
 /* Select 128 (2^7) as divider factor */
-#define MAX_FREQ_DIV (1 << FTM_SC_PS_MASK)
+#define MAX_FREQ_DIV (1 << FTM_SC_PS_DIVISOR)
 
 /* Maximum counter value in FlexTimer's CNT registers */
 #define MAX_COUNT_VAL 0xffff
@@ -144,7 +151,7 @@ static inline void ftm_clock_enable(ftm_t *ftm) {
    */
   uint32_t val = ftm_reg_value(regs->sc);
   val &= ~(FTM_SC_PS_MASK | FTM_SC_CLK_MASK);
-  val |= (FTM_SC_PS_MASK | FTM_SC_CLK(FTM_SC_CLKS_FIXED_FREQ));
+  val |= (FTM_SC_PS_DIVISOR | FTM_SC_CLK(FTM_SC_CLK_SRC));
   regs->sc = ftm_reg_value(val);
 }
 
@@ -276,7 +283,11 @@ static void ftm_handle_irq(void *data, ps_irq_acknowledge_fn_t acknowledge_fn,
      */
     if (interrupt_pending) {
       ftm_tmr_regs_t *regs = ftm_get_regs(ftm);
-      ftm->hi_time += ftm_ticks_to_ns(ftm, ftm_reg_value(regs->mod));
+      /* 
+       * Interrupt occurre when FTM counter equal to MOD value and with
+       * CNTIN as next value. Since CNTIN=0, number of ticks equal to modulo + 1 
+       */
+      ftm->hi_time += ftm_ticks_to_ns(ftm, ftm_reg_value(regs->mod) + 1);
     }
   } else if (ftm->is_periodic == false) {
     ftm_irq_disable(ftm);
@@ -303,7 +314,7 @@ uint64_t ftm_ticks_to_ns(ftm_t *ftm, uint32_t ticks) {
   }
 
   uint32_t fin = ftm_get_freq(ftm);
-
+  
   return freq_cycles_and_hz_to_ns(ticks, fin);
 }
 
@@ -329,8 +340,10 @@ uint64_t ftm_get_time(ftm_t *ftm) {
       /*
        * Bump the hi_time counter now, as there may be latency in serving the
        * interrupt
+       * Interrupt occurre when FTM counter equal to MOD value and with
+       * CNTIN as next value. Since CNTIN=0, number of ticks equal to modulo + 1 
        */
-      ftm->hi_time += ftm_ticks_to_ns(ftm, ftm_reg_value(regs->mod));
+      ftm->hi_time += ftm_ticks_to_ns(ftm, ftm_reg_value(regs->mod) + 1);
     }
 
     return ftm->hi_time + freq_cycles_and_hz_to_ns(cnt, fin);
